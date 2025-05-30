@@ -1,6 +1,31 @@
 $schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.schema.json
-name: blue
-endpoint_name: taxi-fare-online
-model: azureml:taxi-model@latest
-instance_type: Standard_DS2_v2
-instance_count: 1
+# Name of the deployment (e.g., blue for blue-green deployment)
+name: blue  # ${DEPLOYMENT_NAME} - Common values: blue, green, default
+
+# Name of the online endpoint this deployment belongs to
+endpoint_name: onlineendpoint1  # ${ONLINE_ENDPOINT_NAME}
+
+# Reference to the model to deploy
+# Format: azureml:<model-name>@<version>
+model: azureml:${MODEL_NAME}@${MODEL_VERSION}
+
+# Compute instance type for deployment
+# Default: Standard_DS2_v2 (2 cores, 7 GB RAM)
+instance_type: Standard_DS2_v2  # ${INSTANCE_TYPE}
+
+# Number of instances to deploy
+instance_count: 1  # ${INSTANCE_COUNT}
+
+# Optional: Environment configuration
+# environment: azureml:${ENV_NAME}@latest
+
+# Optional: Request and response settings
+# request_settings:
+#   request_timeout_ms: 3000
+#   max_concurrent_requests_per_instance: 1
+#   max_queue_wait_ms: 3000
+
+# Optional: Resource requirements
+# resources:
+#   cpu: 1
+#   memory_in_gb: 2

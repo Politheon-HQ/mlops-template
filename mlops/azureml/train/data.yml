@@ -1,11 +1,38 @@
+# Template for Azure ML data asset configuration
+# Modify this file according to your project's needs
+
 $schema: https://azuremlschemas.azureedge.net/latest/data.schema.json
 
-# Supported paths include:
-# local: ./<path>
-# blob:  https://<account_name>.blob.core.windows.net/<container_name>/<path>
-# ADLS gen2: abfss://<file_system>@<account_name>.dfs.core.windows.net/<path>/
-# Datastore: azureml://datastores/<data_store_name>/paths/<path>
+# TODO: Choose the appropriate data asset type for your needs
+# Available types: uri_file, uri_folder, mltable
 type: uri_file
-name: taxi-data
-description: taxi dataset
-path: ../../../data/taxi-data.csv
+
+# TODO: Replace with your data asset name
+# Use a descriptive, unique name that reflects your data's purpose
+name: ${DATA_ASSET_NAME}
+
+# TODO: Add a clear description of your data asset
+# Include key information like:
+# - What the data contains
+# - Its purpose
+# - Data format
+# - Any preprocessing applied
+# - Version or date if applicable
+description: |
+  ${DATA_DESCRIPTION}
+
+# TODO: Specify the path to your data
+# Supported path formats:
+# 1. Local path:           ./<path>
+# 2. Azure Blob:          https://<account_name>.blob.core.windows.net/<container_name>/<path>
+# 3. Azure Data Lake Gen2: abfss://<file_system>@<account_name>.dfs.core.windows.net/<path>/
+# 4. AzureML Datastore:   azureml://datastores/<data_store_name>/paths/<path>
+path: ${DATA_PATH}
+
+# TODO: Add any additional configuration as needed
+# Example tags for data versioning and tracking:
+# tags:
+#   version: "1.0"
+#   source: "internal"
+#   frequency: "daily"
+#   owner: "data_science_team"

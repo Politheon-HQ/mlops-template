@@ -1,101 +1,164 @@
+# yaml-language-server: $schema=https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 $schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 type: pipeline
-experiment_name: taxi-fare-training
-description: Training Pipeline to train a model that predicts taxi fare price
 
-# <inputs_and_outputs>
+# TODO: Replace with your experiment name and description
+# Use descriptive names that reflect your project's purpose
+experiment_name: ${EXPERIMENT_NAME}
+description: |
+  ${EXPERIMENT_DESCRIPTION}
+
+# <pipeline_inputs_outputs>
+# TODO: Configure pipeline inputs
+# Define all input parameters and data assets needed by your pipeline
 inputs:
+  # Primary input data asset
   input:
-    type: uri_file
-    path: azureml:taxi-data@latest
-  enable_monitoring: 'false'
-  table_name: 'taximonitoring'
+    type: uri_file  # TODO: Adjust type if needed (uri_file, uri_folder, mltable)
+    path: azureml:${INPUT_DATA_NAME}@latest  # TODO: Replace with your data asset name
 
-outputs: 
-  train_data:
-  val_data:
-  test_data:
+  # TODO: Configure monitoring settings
+  enable_monitoring: false  # Set to true to enable monitoring
+  monitoring_table: "${PROJECT_NAME}_monitoring"  # Table name for monitoring
+  model_name: "${MODEL_NAME}"  # Name for the trained model
+
+# TODO: Define all pipeline outputs
+# These will be produced by your pipeline jobs
+outputs:
   trained_model:
+    type: mlflow_model
+    path: azureml://datastores/${DEFAULT_DATASTORE}/paths/models/
   evaluation_output:
-  model_info_output_path:
-# </inputs_and_outputs>
+    type: uri_folder
+    path: azureml://datastores/${DEFAULT_DATASTORE}/paths/evaluation/
+  model_info:
+    type: uri_folder
+    path: azureml://datastores/${DEFAULT_DATASTORE}/paths/model_info/
 
-# <jobs>
+# <pipeline_settings>
+# TODO: Configure pipeline-level settings
 settings:
-  default_datastore: azureml:workspaceblobstore
-  default_compute: azureml:cpu-cluster
-  continue_on_step_failure: false
+  # TODO: Update with your default compute and datastore names
+  default_datastore: azureml:${DEFAULT_DATASTORE}
+  default_compute: azureml:${DEFAULT_COMPUTE}
+  continue_on_step_failure: false  # TODO: Adjust based on your error handling needs
+# </pipeline_settings>
 
+# <pipeline_jobs>
+# TODO: Define all pipeline jobs/steps
 jobs:
+  # Data Preparation Job
   prep_data:
     name: prep_data
     display_name: prep-data
-    code: ../../../data-science/src
-    command: >-
-      python prep.py 
-      --raw_data ${{inputs.raw_data}} 
+    code: ${CODE_PATH}  # Path to your source code
+
+    # TODO: Update command with your script's parameters
+    command: >
+      python prep.py
+      --raw_data ${{inputs.raw_data}}
       --train_data ${{outputs.train_data}}
       --val_data ${{outputs.val_data}}
       --test_data ${{outputs.test_data}}
       --enable_monitoring ${{inputs.enable_monitoring}}
-      --table_name ${{inputs.table_name}}
-    environment: azureml:taxi-train-env@latest
+      --table_name ${{inputs.monitoring_table}}
+
+    # TODO: Specify your environment
+    # Format: azureml:environment-name@version
+    environment: azureml:${TRAINING_ENV}@latest
+
+    # Job inputs mapping
     inputs:
       raw_data: ${{parent.inputs.input}}
       enable_monitoring: ${{parent.inputs.enable_monitoring}}
-      table_name: ${{parent.inputs.table_name}}
-    outputs:
-      train_data: ${{parent.outputs.train_data}}
-      val_data: ${{parent.outputs.val_data}}
-      test_data: ${{parent.outputs.test_data}}
+      table_name: ${{parent.inputs.monitoring_table}}
 
+    # Job outputs mapping
+    outputs:
+      train_data:
+        type: uri_folder
+        path: azureml://datastores/${DEFAULT_DATASTORE}/paths/train/
+      val_data:
+        type: uri_folder
+        path: azureml://datastores/${DEFAULT_DATASTORE}/paths/val/
+      test_data:
+        type: uri_folder
+        path: azureml://datastores/${DEFAULT_DATASTORE}/paths/test/
+
+  # Model Training Job Template
+  # TODO: Customize the training job based on your needs
   train_model:
     name: train_model
     display_name: train-model
-    code: ../../../data-science/src
-    command: >-
-      python train.py 
-      --train_data ${{inputs.train_data}} 
+    code: ${CODE_PATH}
+
+    # TODO: Update command with your training parameters
+    command: >
+      python train.py
+      --train_data ${{inputs.train_data}}
       --model_output ${{outputs.model_output}}
-    environment: azureml:taxi-train-env@latest
+
+    environment: azureml:${TRAINING_ENV}@latest
+
+    # Job inputs mapping
     inputs:
       train_data: ${{parent.jobs.prep_data.outputs.train_data}}
+
+    # Job outputs mapping
     outputs:
       model_output: ${{parent.outputs.trained_model}}
-  
+
+  # Model Evaluation Job Template
+  # TODO: Customize the evaluation metrics and criteria
   evaluate_model:
     name: evaluate_model
     display_name: evaluate-model
-    code: ../../../data-science/src
-    command: >-
-      python evaluate.py 
-      --model_name ${{inputs.model_name}} 
-      --model_input ${{inputs.model_input}} 
-      --test_data ${{inputs.test_data}} 
+    code: ${CODE_PATH}
+
+    # TODO: Update command with your evaluation parameters
+    command: >
+      python evaluate.py
+      --model_name ${{inputs.model_name}}
+      --model_input ${{inputs.model_input}}
+      --test_data ${{inputs.test_data}}
       --evaluation_output ${{outputs.evaluation_output}}
-    environment: azureml:taxi-train-env@latest
+
+    environment: azureml:${TRAINING_ENV}@latest
+
+    # Job inputs mapping
     inputs:
-      model_name: "taxi-model"
+      model_name: ${MODEL_NAME}
       model_input: ${{parent.jobs.train_model.outputs.model_output}}
       test_data: ${{parent.jobs.prep_data.outputs.test_data}}
+
+    # Job outputs mapping
     outputs:
       evaluation_output: ${{parent.outputs.evaluation_output}}
 
+  # Model Registration Job Template
+  # TODO: Customize model registration parameters and metadata
   register_model:
     name: register_model
     display_name: register-model
-    code: ../../../data-science/src
-    command: >-
-      python register.py 
-      --model_name ${{inputs.model_name}} 
-      --model_path ${{inputs.model_path}} 
+    code: ${CODE_PATH}
+
+    # TODO: Update command with your registration parameters
+    command: >
+      python register.py
+      --model_name ${{inputs.model_name}}
+      --model_path ${{inputs.model_path}}
       --evaluation_output ${{inputs.evaluation_output}}
       --model_info_output_path ${{outputs.model_info_output_path}}
-    environment: azureml:taxi-train-env@latest
+
+    environment: azureml:${TRAINING_ENV}@latest
+
+    # Job inputs mapping
     inputs:
-      model_name: "taxi-model"
+      model_name: ${MODEL_NAME}
       model_path: ${{parent.jobs.train_model.outputs.model_output}}
       evaluation_output: ${{parent.jobs.evaluate_model.outputs.evaluation_output}}
+
+    # Job outputs mapping
     outputs:
-      model_info_output_path: ${{parent.outputs.model_info_output_path}}
-# </jobs>
+      model_info: ${{parent.outputs.model_info}}
+# </pipeline_jobs>

@@ -3,6 +3,7 @@ repos:
     rev: v4.2.0
     hooks:
     -   id: check-yaml
+        files: ^(?!.*azureml).*\.ya?ml$  # Skip Azure ML YAML files
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
 

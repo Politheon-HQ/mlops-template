@@ -1,4 +1,15 @@
 $schema: https://azuremlschemas.azureedge.net/latest/managedOnlineEndpoint.schema.json
-name: taxi-fare-online
-description: taxi cost online endpoint
-auth_mode: key
+# Name of the online endpoint
+# Must start with a letter and contain only letters, numbers, and hyphens
+name: onlineendpoint1  # ${ONLINE_ENDPOINT_NAME}
+
+# Description of the online endpoint's purpose
+description: Online inference endpoint  # ${ONLINE_ENDPOINT_DESCRIPTION}
+
+# Authentication settings
+auth_mode: key  # ${AUTH_MODE} - Options: key, aad_token
+
+# Optional: Traffic rules for blue-green deployment
+# traffic:
+#   blue: 90
+#   green: 10

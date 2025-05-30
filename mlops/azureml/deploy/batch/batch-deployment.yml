@@ -1,16 +1,39 @@
+# yaml-language-server: $schema=https://azuremlschemas.azureedge.net/latest/batchDeployment.schema.json
 $schema: https://azuremlschemas.azureedge.net/latest/batchDeployment.schema.json
-name: batch-dp
-endpoint_name: taxi-fare-batch
-model: azureml:taxi-model@latest
-compute: azureml:batch-cluster
+# Name of the batch deployment
+name: ${BATCH_DEPLOYMENT_NAME}
+
+# Name of the batch endpoint this deployment belongs to
+endpoint_name: ${BATCH_ENDPOINT_NAME}
+
+# Reference to the model to deploy
+# Format: azureml:<model-name>@<version>
+model: azureml:${MODEL_NAME}@${MODEL_VERSION}
+
+# Compute cluster to run the batch deployment
+compute: azureml:${COMPUTE_CLUSTER_NAME}
+
+# Compute resources for the deployment
 resources:
-  instance_count: 1
-max_concurrency_per_instance: 2
-mini_batch_size: 10
-output_action: append_row
-output_file_name: predictions.csv
+  # Number of instances to use for batch processing (default: 1)
+  instance_count: 1  # ${INSTANCE_COUNT}
+
+# Maximum number of parallel batch scoring operations per instance (default: 2)
+max_concurrency_per_instance: 2  # ${MAX_CONCURRENCY}
+
+# Number of records to include in each mini-batch (default: 10)
+mini_batch_size: 10  # ${MINI_BATCH_SIZE}
+
+# How to handle the output data
+output_action: append_row  # ${OUTPUT_ACTION} - Options: append_row, summary_only
+output_file_name: predictions.csv  # ${OUTPUT_FILENAME}
+
+# Retry configuration for failed operations
 retry_settings:
-  max_retries: 3
-  timeout: 30
-error_threshold: -1
+  max_retries: 3  # ${MAX_RETRIES}
+  timeout: 30  # ${TIMEOUT_SECONDS}
+
+# Number of errors allowed before the batch deployment fails
+# Set to -1 for no limit
+error_threshold: -1  # ${ERROR_THRESHOLD}
 logging_level: info

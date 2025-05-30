@@ -1,4 +1,12 @@
+# yaml-language-server: $schema=https://azuremlschemas.azureedge.net/latest/batchEndpoint.schema.json
 $schema: https://azuremlschemas.azureedge.net/latest/batchEndpoint.schema.json
-name: taxi-fare-batch
-description: taxi cost batch endpoint
-auth_mode: aad_token
+
+# Name of the batch endpoint
+# Must start with a letter and contain only letters, numbers, and hyphens
+name: batchendpoint1  # ${BATCH_ENDPOINT_NAME}
+
+# Description of the batch endpoint's purpose
+description: Batch inference endpoint  # ${BATCH_ENDPOINT_DESCRIPTION}
+
+# Authentication settings
+auth_mode: aad_token  # ${AUTH_MODE} - Options: key, aad_token

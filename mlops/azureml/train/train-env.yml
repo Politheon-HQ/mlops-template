@@ -1,5 +1,10 @@
 $schema: https://azuremlschemas.azureedge.net/latest/environment.schema.json
-name: taxi-train-env
-image: mcr.microsoft.com/azureml/openmpi3.1.2-ubuntu18.04
-conda_file: ../../../data-science/environment/train-conda.yml
+name: ${TRAINING_ENV_NAME}
+
+# Base image for the environment
+# Default: mcr.microsoft.com/azureml/openmpi3.1.2-ubuntu18.04
+image: ${BASE_IMAGE}
+
+# Path to the conda environment file
+conda_file: ${CONDA_ENV_PATH}
 description: Environment created from a Docker image plus Conda environment to train taxi model.

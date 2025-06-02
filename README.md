@@ -42,6 +42,25 @@ A comprehensive MLOps template for machine learning projects using Azure Machine
 
 ## 🛠️ Setup
 
+1. Install Poetry for dependency management:
+   ```bash
+   curl -sSL https://install.python-poetry.org | python3 -
+   ```
+
+2. Customize the project:
+   - Edit `pyproject.toml` to change the project name, description, and author
+   - Add/remove dependencies as needed using `poetry add` or by editing `pyproject.toml`
+
+3. Install project dependencies:
+   ```bash
+   poetry install
+   ```
+
+4. Set up pre-commit hooks:
+   ```bash
+   pre-commit install
+   ```
+
 1. **Prerequisites**
    - Azure Subscription
    - GitHub Account
